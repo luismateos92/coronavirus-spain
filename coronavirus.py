@@ -749,19 +749,22 @@ def getData():
 
 @st.cache
 def createDataframeFromJson(raw_data):
-    dict_months = {'Enero':1, 'Febrero':2, 'Marzo':3, 'Abril':4, 'Mayo':5, 'Junio':6, 'Julio':7, 'Agosto':8, 'Septiembre':9, 'Octubre':10, 'Noviembre':11, 'Diciembre':12}
+    dict_months = {'Enero':1, 'Febrero':2, 'Marzo':3, 'Abril':4, 'Mayo':5, 'Junio':6, 'Julio':7, 'Agosto':8, 'Septiembre':9, 'Octubre':10, 'Noviembre':11, 'Diciembre':12, 'enero':1, 'febrero':2, 'marzo':3, 'abril':4, 'mayo':5, 'junio':6, 'julio':7, 'agosto':8, 'septiembre':9, 'octubre':10, 'noviembre':11, 'diciembre':12}
     number_days_monitored = len(raw_data['Respuesta'][0]['Metricas'][0]['Datos'])
     list_cases_dates = []
     for day in range(number_days_monitored):
+        agno = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]
         date = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Parametro']
         cases = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Valor']
         list_cases_dates.append([date, cases])     
-    df0 = pd.DataFrame(list_cases_dates, columns = ['Date' , 'Cases'])
-    df0[['Day', 'Month']] = df0['Date'].str.extract(r'([\d]+) \((.*?)\)')
+    df0 = pd.DataFrame(list_cases_dates, columns = ['Año', 'Date' , 'Cases'])
+    df0['Date'] = df0['Date'].str.replace(" de ", '-')
+    df0['Date'] = df0['Date'].str.replace("Día ", "")
+    df0[['Day', 'Month']] = df0['Date'].str.extract(r'([\d]{1,2})-(.*)')
     df0.replace({'Month': dict_months}, inplace= True)
-    df0['Period'] = '2020' + '/' + df0['Month'].astype(str) + '/' + df0['Day'].astype(str)
+    df0['Period'] = df0['Año'].astype(str) + '/' + df0['Month'].astype(str) + '/' + df0['Day'].astype(str)
     df0['Period'] = df0['Period'].apply(lambda x: datetime.strptime(x, '%Y/%m/%d'))
-    df0.drop(['Date', 'Day', 'Month'], axis=1, inplace = True)
+    df0.drop(['Año', 'Date', 'Day', 'Month'], axis=1, inplace = True)
     df0.sort_values(by=['Period'], inplace = True)
     df0['Day'] = range(number_days_monitored)
     return df0
