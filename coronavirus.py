@@ -756,7 +756,7 @@ def createDataframeFromJson(raw_data):
         agno = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]
         date = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Parametro']
         cases = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Valor']
-        list_cases_dates.append([date, cases])     
+        list_cases_dates.append([agno, date, cases])     
     df0 = pd.DataFrame(list_cases_dates, columns = ['Año', 'Date' , 'Cases'])
     df0['Date'] = df0['Date'].str.replace(" de ", '-')
     df0['Date'] = df0['Date'].str.replace("Día ", "")
