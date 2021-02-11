@@ -10,7 +10,7 @@ import matplotlib
 import streamlit as st
 import altair as alt
 import time
-
+st.set_option('deprecation.showPyplotGlobalUse', False)
 if sys.version_info[0] < 3:
     reload(sys) # noqa: F821 pylint:disable=undefined-variable
     sys.setdefaultencoding("utf-8")
@@ -753,7 +753,7 @@ def createDataframeFromJson(raw_data):
     number_days_monitored = len(raw_data['Respuesta'][0]['Metricas'][0]['Datos'])
     list_cases_dates = []
     for day in range(number_days_monitored):
-        agno = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]
+        agno = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Agno']
         date = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Parametro']
         cases = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Valor']
         list_cases_dates.append([agno, date, cases])     
@@ -762,7 +762,7 @@ def createDataframeFromJson(raw_data):
     df0['Date'] = df0['Date'].str.replace("Día ", "")
     df0[['Day', 'Month']] = df0['Date'].str.extract(r'([\d]{1,2})-(.*)')
     df0.replace({'Month': dict_months}, inplace= True)
-    df0['Period'] = '2020' + '/' + df0['Month'].astype(str) + '/' + df0['Day'].astype(str)
+    df0['Period'] = df0['Agno'].astype(str) + '/' + df0['Month'].astype(str) + '/' + df0['Day'].astype(str)
     if (not df0['Month'].astype(str).any() and not df0['Day'].astype(str).any()):
         df0['Period'] = df0['Period'].apply(lambda x: datetime.strptime(x, '%Y/%m/%d'))
     df0.drop(['Agno', 'Date', 'Day', 'Month'], axis=1, inplace = True)
