@@ -757,14 +757,15 @@ def createDataframeFromJson(raw_data):
         date = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Parametro']
         cases = raw_data['Respuesta'][0]['Metricas'][0]['Datos'][day]['Valor']
         list_cases_dates.append([agno, date, cases])     
-    df0 = pd.DataFrame(list_cases_dates, columns = ['Año', 'Date' , 'Cases'])
+    df0 = pd.DataFrame(list_cases_dates, columns = ['Agno', 'Date' , 'Cases'])
     df0['Date'] = df0['Date'].str.replace(" de ", '-')
     df0['Date'] = df0['Date'].str.replace("Día ", "")
     df0[['Day', 'Month']] = df0['Date'].str.extract(r'([\d]{1,2})-(.*)')
     df0.replace({'Month': dict_months}, inplace= True)
-    df0['Period'] = df0['Año'].astype(str) + '/' + df0['Month'].astype(str) + '/' + df0['Day'].astype(str)
-    df0['Period'] = df0['Period'].apply(lambda x: datetime.strptime(x, '%Y/%m/%d'))
-    df0.drop(['Año', 'Date', 'Day', 'Month'], axis=1, inplace = True)
+    df0['Period'] = '2020' + '/' + df0['Month'].astype(str) + '/' + df0['Day'].astype(str)
+    if (not df0['Month'].astype(str).any() and not df0['Day'].astype(str).any()):
+        df0['Period'] = df0['Period'].apply(lambda x: datetime.strptime(x, '%Y/%m/%d'))
+    df0.drop(['Agno', 'Date', 'Day', 'Month'], axis=1, inplace = True)
     df0.sort_values(by=['Period'], inplace = True)
     df0['Day'] = range(number_days_monitored)
     return df0
