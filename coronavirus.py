@@ -10,6 +10,7 @@ import matplotlib
 import streamlit as st
 import altair as alt
 import time
+
 st.set_option('deprecation.showPyplotGlobalUse', False)
 if sys.version_info[0] < 3:
     reload(sys) # noqa: F821 pylint:disable=undefined-variable
